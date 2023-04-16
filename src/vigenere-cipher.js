@@ -22,97 +22,75 @@ const { NotImplementedError } = require('../extensions/index.js');
 class VigenereCipheringMachine {
   constructor(reverse = true) {
     this.IsReverse = !reverse;
+    this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   }
-  encrypt(message, key) {
+  throwError(message, key) {
     if(!message || !key) {
       throw Error('Incorrect arguments!');
     }
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const result = [];
-
-    const makeKey = () => {
-      while(key.length < message.length) {
-        key = `${key}${key}`;
-      }
-    };
-
-    if(key.length < message.length) {
-      makeKey();
+  }
+  makeKey(key, message) {
+    while(key.length < message.length) {
+      key = `${key}${key}`;
     }
-
+    return key;
+  }
+  formStr(message, key, isEncrypting) {
+    const result = [];
     let count = 0;
     for(let i = 0; i < message.length; i++) {
       if(message[i] === ' ') {
         result.push(' ');
       } else {
-        const code = alphabet.indexOf(message[i].toUpperCase());
-        const keyCode = alphabet.indexOf(key[count].toUpperCase());
+        const code = this.alphabet.indexOf(message[i].toUpperCase());
+        const keyCode = this.alphabet.indexOf(key[count].toUpperCase());
         
         if(code === -1 || keyCode === -1) {
           result.push(message[i]);
         } else {
-          const sum = code + keyCode;
-          if(sum < alphabet.length) {
-            result.push(alphabet[sum]);
+          if(isEncrypting) {
+            const sum = code + keyCode;
+            if(sum < this.alphabet.length) {
+              result.push(this.alphabet[sum]);
+            } else {
+              result.push(this.alphabet[sum - this.alphabet.length]);
+            }
           } else {
-            result.push(alphabet[sum - alphabet.length]);
+            const diff = code - keyCode;
+            if(diff >= 0) {
+              result.push(this.alphabet[code - keyCode]);
+            } else {
+              result.push(this.alphabet[this.alphabet.length + diff]);
+            }
           }
         }
         count++; 
       }
     }
+    return result;
+  }
+  encrypt(message, key) {
+    this.throwError(message, key);
+    if(key.length < message.length) {
+      key = this.makeKey(key, message);
+    }
+    const result = this.formStr(message, key, true);
 
     return this.IsReverse ? result.reverse().join('') : result.join('');
 
   }
   decrypt(encryptedMessage, key) {
-    console.log(this.IsReverse);
-    if(!encryptedMessage || !key) {
-      throw Error('Incorrect arguments!');
-    }
-
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const result = [];
-
-    const makeKey = () => {
-      while(key.length < encryptedMessage.length) {
-        key = `${key}${key}`;
-      }
-    };
+    this.throwError(encryptedMessage, key);
 
     if(key.length < encryptedMessage.length) {
-      makeKey();
+      key = this.makeKey(key, encryptedMessage);
     }
 
-    let count = 0;
-    for(let i = 0; i < encryptedMessage.length; i++) {
-      if(encryptedMessage[i] === ' ') {
-        result.push(' ');
-      } else {
-        const code = alphabet.indexOf(encryptedMessage[i].toUpperCase());
-        const keyCode = alphabet.indexOf(key[count].toUpperCase());
-        
-        if(code === -1 || keyCode === -1) {
-          result.push(encryptedMessage[i]);
-        } else {
-          const diff = code - keyCode;
-          if(diff >= 0) {
-            result.push(alphabet[code - keyCode]);
-          } else {
-            result.push(alphabet[alphabet.length + diff]);
-          }
-        }
-        count++; 
-      }
-    }
+    const result = this.formStr(encryptedMessage, key, false);
 
     return this.IsReverse ? result.reverse().join('') : result.join('');
   }
 }
-
-const directMachine = new VigenereCipheringMachine();
-
-console.log(directMachine.decrypt('AEIHQX SX DLLU!', 'alphonse'));
 
 module.exports = {
   VigenereCipheringMachine
