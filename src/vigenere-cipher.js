@@ -20,15 +20,99 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(reverse = true) {
+    this.IsReverse = !reverse;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  encrypt(message, key) {
+    if(!message || !key) {
+      throw Error('Incorrect arguments!');
+    }
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const result = [];
+
+    const makeKey = () => {
+      while(key.length < message.length) {
+        key = `${key}${key}`;
+      }
+    };
+
+    if(key.length < message.length) {
+      makeKey();
+    }
+
+    let count = 0;
+    for(let i = 0; i < message.length; i++) {
+      if(message[i] === ' ') {
+        result.push(' ');
+      } else {
+        const code = alphabet.indexOf(message[i].toUpperCase());
+        const keyCode = alphabet.indexOf(key[count].toUpperCase());
+        
+        if(code === -1 || keyCode === -1) {
+          result.push(message[i]);
+        } else {
+          const sum = code + keyCode;
+          if(sum < alphabet.length) {
+            result.push(alphabet[sum]);
+          } else {
+            result.push(alphabet[sum - alphabet.length]);
+          }
+        }
+        count++; 
+      }
+    }
+
+    return this.IsReverse ? result.reverse().join('') : result.join('');
+
+  }
+  decrypt(encryptedMessage, key) {
+    console.log(this.IsReverse);
+    if(!encryptedMessage || !key) {
+      throw Error('Incorrect arguments!');
+    }
+
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const result = [];
+
+    const makeKey = () => {
+      while(key.length < encryptedMessage.length) {
+        key = `${key}${key}`;
+      }
+    };
+
+    if(key.length < encryptedMessage.length) {
+      makeKey();
+    }
+
+    let count = 0;
+    for(let i = 0; i < encryptedMessage.length; i++) {
+      if(encryptedMessage[i] === ' ') {
+        result.push(' ');
+      } else {
+        const code = alphabet.indexOf(encryptedMessage[i].toUpperCase());
+        const keyCode = alphabet.indexOf(key[count].toUpperCase());
+        
+        if(code === -1 || keyCode === -1) {
+          result.push(encryptedMessage[i]);
+        } else {
+          const diff = code - keyCode;
+          if(diff >= 0) {
+            result.push(alphabet[code - keyCode]);
+          } else {
+            result.push(alphabet[alphabet.length + diff]);
+          }
+        }
+        count++; 
+      }
+    }
+
+    return this.IsReverse ? result.reverse().join('') : result.join('');
   }
 }
+
+const directMachine = new VigenereCipheringMachine();
+
+console.log(directMachine.decrypt('AEIHQX SX DLLU!', 'alphonse'));
 
 module.exports = {
   VigenereCipheringMachine
