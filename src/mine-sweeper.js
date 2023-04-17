@@ -103,14 +103,6 @@ function minesweeper(matrix) {
   return result;
 }
 
-const matrix = [
-    [true, false, false],
-    [false, true, false],
-    [false, false, false]
-   ];
-
-  console.log(minesweeper(matrix));
-
 module.exports = {
   minesweeper
 };

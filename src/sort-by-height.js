@@ -24,13 +24,11 @@ function sortByHeight(arr) {
   let filteredArr = arr.filter(item => item !== -1).sort((a,b) => a-b);
 
   for(let i = 0; i < onesIndexes.length; i++) {
-    filteredArr = filteredArr.splice(onesIndexes[i], 0, -1);
+    filteredArr.splice(onesIndexes[i], 0, -1);
   }
 
   return filteredArr;
 }
-
-console.log(sortByHeight([-1, 150, 190, 170, -1, -1, 160, 180]))
 
 module.exports = {
   sortByHeight
