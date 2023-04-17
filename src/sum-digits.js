@@ -15,7 +15,6 @@ const { NotImplementedError } = require('../extensions/index.js');
 function getSumOfDigits(n) {
   const arr = Array.from(String(n), Number);
   let sum = arr.reduce((prev, acc) => prev + acc);
-  console.log(sum);
 
   if(sum <= 9) {
     return sum;
